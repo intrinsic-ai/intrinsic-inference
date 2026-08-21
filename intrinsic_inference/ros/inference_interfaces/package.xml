@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright 2026 Intrinsic Innovation LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<!--
+  This package.xml is required for external ROS 2 / colcon builds (e.g.
+  downstream ROS packages) to discover and generate InferenceNode
+  interfaces without Bazel. Within this repository, interfaces are built
+  via Bazel (see intrinsic_inference/ros/BUILD).
+-->
+<package format="3">
+  <name>inference_interfaces</name>
+  <version>0.0.1</version>
+  <description>ROS 2 service interfaces for Intrinsic Inference</description>
+  <maintainer email="info@intrinsic.ai">Intrinsic</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
