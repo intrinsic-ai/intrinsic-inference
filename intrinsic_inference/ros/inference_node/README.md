@@ -32,21 +32,17 @@ backends (like NVIDIA Triton):
 1.   **In-Process Inference Engine**: Directly manages `InferenceRunner`,
   handling model asset reconciliation, lifecycle states, and optional shared
   memory (SHM).
-2.   **OpenInferenceProtocol over ROS 2**: Exposes 6 standard OIP endpoints as
-  ROS 2 services:
+2.   **OpenInferenceProtocol over ROS 2**: Exposes OIP-based endpoints as ROS 2
+  services:
 
 -   `/ServerLive`
 -   `/ServerReady`
 -   `/ModelReady`
--   `/ServerMetadata`
 -   `/ModelMetadata`
 -   `/ModelInfer`
 
-1.   **Unified Communication Interface with Serialized Protos**: Currently, all
-  endpoints use a single, unified `InferenceRPC.srv` service definition that
-  passes serialized Protobuf request and response bytes directly across ROS 2.
-  *(Note: Dedicated per-endpoint `.srv` files may replace this generic interface
-  in future releases).*
+See [`intrinsic_inference/ros/inference_interfaces/`](../inference_interfaces/)
+for interface definitions.
 
 ```mermaid
 flowchart LR
@@ -55,7 +51,7 @@ flowchart LR
     C["InferenceRunner<br>(ModelAssetsManagerLocalRepo + ModelController)"]
     D["Triton Inference Server<br>(--model-control-mode=explicit)"]
 
-    A <-->|"ROS 2 Service Calls (InferenceRPC)"| B
+    A <-->|"ROS 2 Service Calls<br>(e.g. /ServerLive)"| B
     B -->|"Direct In-Process Call"| C
     C -->|"gRPC"| D
 ```
@@ -105,24 +101,7 @@ docker run --rm \
 
 ---
 
-### 2. Connect ROS 2 Service Interfaces (`inference_interfaces`)
-
-To make `InferenceRPC.srv` visible to your external ROS 2 / Colcon environment
-(e.g. `demos/`):
-
-```bash
-# Symlink package from the intrinsic_inference repo into demos workspace
-ln -sfn <full_path_to>/intrinsic_inference/ros/inference_interfaces <full_path_to>/demos/external/inference_interfaces
-
-# Build the interface package in your ROS environment (e.g. inside Pixi)
-cd <full_path_to>/demos
-pixi run colcon build --symlink-install --packages-select inference_interfaces
-source install/setup.bash
-```
-
----
-
-### 3. Launch `InferenceNode`
+### 2. Launch `InferenceNode`
 
 In your `intrinsic-inference` repository workspace:
 
@@ -143,60 +122,76 @@ more details on CycloneDDS.
 
 ---
 
+### 3. Connect ROS 2 Service Interfaces (`inference_interfaces`)
+
+To make the custom OIP-based interfaces [`inference_interfaces/`](../inference_interfaces/)
+visible to your external ROS 2 / Colcon environment (e.g. `demos/`):
+
+```bash
+cd <full_path_to>/demos
+
+# Symlink package from the intrinsic_inference repo into demos workspace ("external/" folder)
+ln -sfn <full_path_to>/intrinsic_inference/ros/inference_interfaces external/inference_interfaces
+
+# Import external dependencies (tensor_msgs)
+pixi run vcs import < external/inference_interfaces/dependencies.repos
+
+# Build the interface package and its dependencies in your ROS environment (e.g. inside Pixi)
+pixi run colcon build --symlink-install --packages-up-to inference_interfaces
+source install/setup.bash
+```
+
+---
+
 ### 4. Verify & Test with ROS 2 CLI
 
 In your client terminal (e.g., inside `pixi shell` in `demos`):
 
 ```bash
+# Launch pixi environment
+pixi shell
+
 # Important: Ensure the client uses the same middleware
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 
-# 1. Check Service Registration
-ros2 service type /ServerLive
-# Returns: inference_interfaces/srv/InferenceRPC
-
-ros2 interface show inference_interfaces/srv/InferenceRPC
+# View availble ROS services
+ros2 service list
 # Returns:
-#   uint8[] raw_request
+#   /inference_node/describe_parameters
+#   /inference_node/get_parameter_types
+#   /inference_node/get_parameters
+#   /inference_node/list_parameters
+#   /inference_node/model_infer
+#   /inference_node/model_metadata
+#   /inference_node/model_ready
+#   /inference_node/server_live
+#   /inference_node/server_ready
+#   /inference_node/set_parameters
+#   /inference_node/set_parameters_atomically
+
+# Check Service Registration
+ros2 service type /inference_node/server_live
+# Returns: inference_interfaces/srv/ServerLive
+
+ros2 interface show inference_interfaces/srv/ServerLive
+# Returns:
+#   # Query ServerLive status of the inference server
+#
 #   ---
 #   bool success
 #   string error_message
-#   uint8[] raw_response
+#   bool live
 
-# 2. Test Server Liveness (/ServerLive)
-ros2 service call /ServerLive inference_interfaces/srv/InferenceRPC "{raw_request: []}"
-# Response: success=True, raw_response=[8, 1]
+# Test Server Liveness (/inference_node/server_live)
+ros2 service call /inference_node/server_live inference_interfaces/srv/ServerLive "{}"
+# Returns:
+#   ...
+#   response:
+#   inference_interfaces.srv.ServerLive_Response(success=True, error_message='', live=True)
 
-# 3. Query Model Metadata for densenet_onnx (/ModelMetadata)
-# Encoded proto payload: name: "densenet_onnx", version: "1"
-ros2 service call /ModelMetadata inference_interfaces/srv/InferenceRPC "{raw_request: [10, 13, 100, 101, 110, 115, 101, 110, 101, 116, 95, 111, 110, 110, 120, 18, 1, 49]}"
+# Query Model Metadata for densenet_onnx (/ModelMetadata)
+ros2 service call /inference_node/model_metadata inference_interfaces/srv/ModelMetadata "{model_name: 'densenet_onnx', model_version: '1'}"
 ```
-
----
-
-## Service Definition & Message Format
-
-Location: [`intrinsic_inference/ros/inference_interfaces/srv/InferenceRPC.srv`](../inference_interfaces/srv/InferenceRPC.srv)
-
-```idl
-uint8[] raw_request
----
-bool success
-string error_message
-uint8[] raw_response
-```
-
-### Workflow
-
-1.   **Request**: The client serializes a standard OpenInferenceProtocol
-  Protobuf request (`ServerLiveRequest`, `ModelInferRequest`, etc.) into
-  `raw_request` bytes.
-2.   **Execution**: `InferenceNode` parses the bytes into the corresponding
-  Protobuf, forwards the call to `InferenceRunner`, and executes the backend
-  inference.
-3.   **Response**: The Protobuf response is serialized into `raw_response` bytes
-   with `success = True`. If any error occurs during deserialization or
-   execution, `success = False` and `error_message` is populated.
 
 ---
 
@@ -210,8 +205,9 @@ uint8[] raw_response
   export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
   ```
 
-  *(If using Pixi, may need to ensure `ros-kilted-rmw-cyclonedds-cpp` /
-  `ros-jazzy-rmw-cyclonedds-cpp` is installed in `pixi.toml`).*
+  This allows all systems to align in using the same middleware protocol,
+  since ROS 2 nodes can only discover and communicate with each other
+  when using the exact same middleware protocol.
 
 ---
 

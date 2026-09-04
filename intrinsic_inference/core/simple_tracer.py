@@ -17,7 +17,7 @@
 This module provides a convenient way to set up a local OpenTelemetry tracing
 pipeline that exports traces directly to a JSON file in Trace Event Format.
 This is useful for standalone or development environments where running a
-collector (like Jaeger) is not desired.
+collector is not desired.
 
 Example usage:
   from intrinsic_inference.core import simple_tracer

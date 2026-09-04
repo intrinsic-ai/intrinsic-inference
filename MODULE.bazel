@@ -55,8 +55,20 @@ extension_for_rules_ros2 = use_extension("@com_github_mvukov_rules_ros2//ros2:ex
 use_repo(
     extension_for_rules_ros2,
     "ros2_common_interfaces",
+    "ros2_rcl_interfaces",
     "ros2_rclpy",
     "ros2_rosidl",
+)
+
+# Get the tensor_msgs package from source.
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "ros2_tensor_msgs",
+    build_file = "//bazel:tensor_msgs.BUILD.bazel",
+    sha256 = "e6ff4cac00b7f4be4f54e4a2cb0f67ef3f8e9d20c98c6baf32d6bcfd70d41117",
+    strip_prefix = "rosidl_buffer_backends-0.1.1/tensor_msgs",
+    urls = ["https://github.com/ros2/rosidl_buffer_backends/archive/refs/tags/0.1.1.tar.gz"],
 )
 
 # Python toolchain & pip deps

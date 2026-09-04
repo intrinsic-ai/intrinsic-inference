@@ -12,33 +12,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Builds tensor_msgs ROS 2 interface library."""
+
 load(
     "@com_github_mvukov_rules_ros2//ros2:interfaces.bzl",
+    "c_ros2_interface_library",
     "cpp_ros2_interface_library",
     "py_ros2_interface_library",
     "ros2_interface_library",
 )
 
-package(default_visibility = ["//visibility:public"])
-
 ros2_interface_library(
-    name = "inference_interfaces",
-    srcs = glob([
-        "inference_interfaces/msg/*.msg",
-        "inference_interfaces/srv/*.srv",
-    ]),
-    deps = [
-        "@ros2_tensor_msgs//:tensor_msgs",
-        "@ros2_rcl_interfaces//:rcl_interfaces",
-    ],
+    name = "tensor_msgs",
+    srcs = glob(["msg/*.msg"]),
+    visibility = ["//visibility:public"],
+    deps = ["@ros2_rcl_interfaces//:builtin_interfaces"],
 )
 
-py_ros2_interface_library(
-    name = "py_inference_interfaces",
-    deps = [":inference_interfaces"],
+c_ros2_interface_library(
+    name = "c_tensor_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":tensor_msgs"],
 )
 
 cpp_ros2_interface_library(
-    name = "cpp_inference_interfaces",
-    deps = [":inference_interfaces"],
+    name = "cpp_tensor_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":tensor_msgs"],
+)
+
+py_ros2_interface_library(
+    name = "py_tensor_msgs",
+    visibility = ["//visibility:public"],
+    deps = [":tensor_msgs"],
 )

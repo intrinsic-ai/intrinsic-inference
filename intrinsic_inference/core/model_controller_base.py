@@ -238,7 +238,7 @@ class ModelControllerBase(abc.ABC):
     model_name = model_proto.model_config.name
 
     with self._lock:
-      # Start with key lookup by name or package.name.version before falling
+      # Start with key lookup by name or name.version before falling
       # back to prefix matching.
       full_key = (
           f"{model_proto.model_config.name}.{model_proto.model_config.version}"

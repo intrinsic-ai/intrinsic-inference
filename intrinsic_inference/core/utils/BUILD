@@ -14,13 +14,12 @@
 
 load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
-package(default_visibility = [
-    "//:__subpackages__",
-])
-
 py_library(
     name = "oip_mappings",
     srcs = ["oip_mappings.py"],
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         "@intrinsic_inference_pip_deps//numpy",
     ],
@@ -29,6 +28,9 @@ py_library(
 py_library(
     name = "oip_utils",
     srcs = ["oip_utils.py"],
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         ":oip_mappings",
         "@intrinsic_inference_pip_deps//numpy",

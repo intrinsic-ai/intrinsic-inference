@@ -19,7 +19,6 @@ import tempfile
 from unittest import mock
 
 from absl.testing import absltest
-import grpc
 from tritonclient.grpc import model_config_pb2
 
 from intrinsic_inference.core import model_assets_manager_base

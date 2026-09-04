@@ -12,10 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Generic RPC service for passing serialized OpenInferenceProtocol protobufs.
+# Query ServerReady status of the inference server
 
-uint8[] raw_request
 ---
 bool success
 string error_message
-uint8[] raw_response
+bool ready

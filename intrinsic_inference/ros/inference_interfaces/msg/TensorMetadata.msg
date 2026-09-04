@@ -12,20 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_uv//uv:pip.bzl", "pip_compile")
+# Tensor metadata describing input or output tensor schemas
 
-package(default_visibility = ["//visibility:public"])
-
-exports_files([
-    "MODULE.bazel",
-    "requirements.in",
-    "requirements.txt",
-])
-
-# Compile requirements after changing requirements.in by executing: bazel run @@//:requirements
-pip_compile(
-    name = "requirements",
-    requirements_in = ":requirements.in",
-    requirements_txt = ":requirements.txt",
-    tags = ["manual"],
-)
+string name
+string datatype     # OIP string (e.g., "FP32", "INT64") for OIP familiarity
+uint8 dtype_code    # DLPack code (e.g., 2 for float)
+uint16 dtype_bits   # DLPack bit width (e.g., 32)
+int64[] shape

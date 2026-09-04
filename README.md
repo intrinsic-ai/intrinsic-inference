@@ -17,10 +17,10 @@ limitations under the License.
 
 ## Overview
 
-This repository contains open-source code for ml inference applications.
+This repository contains code for ml inference applications.
 
 > [!NOTE]
-> This repository is currently a preview release for iterations with the Special 
+> This repository is currently a preview release for iterations with the Special
 Interest Group on Physical AI and is not considered stable.
 
 ## Structure
@@ -34,10 +34,17 @@ intrinsic-inference/
 │   │   └── ml_model.proto
 │   ├── inference_runner.py
 │   └── ...
-└── ros/                      # ROS inference node.
+└── ros/                      # ROS related code.
     ├── BUILD
-    └── inference_node
+    ├── inference_msgs        # Inference node interface package.
+    │   └── ...
+    └── inference_node        # ROS inference node.
         ├── BUILD
         ├── inference_node.py
         └── ...
 ```
+
+## Docs
+
+-   [**ROS inference node docs**](intrinsic_inference/ros/inference_node/README.md)
+-   [**Core framework docs**](intrinsic_inference/core/README.md)

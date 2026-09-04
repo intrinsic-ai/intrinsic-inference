@@ -12,20 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_uv//uv:pip.bzl", "pip_compile")
+# Named tensor wrapping DLPack-aligned ExperimentalTensor
 
-package(default_visibility = ["//visibility:public"])
-
-exports_files([
-    "MODULE.bazel",
-    "requirements.in",
-    "requirements.txt",
-])
-
-# Compile requirements after changing requirements.in by executing: bazel run @@//:requirements
-pip_compile(
-    name = "requirements",
-    requirements_in = ":requirements.in",
-    requirements_txt = ":requirements.txt",
-    tags = ["manual"],
-)
+string name
+tensor_msgs/ExperimentalTensor tensor

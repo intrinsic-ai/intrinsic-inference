@@ -22,9 +22,18 @@ project(inference_interfaces)
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(rcl_interfaces REQUIRED)
+find_package(tensor_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "srv/InferenceRPC.srv"
+  "msg/NamedTensor.msg"
+  "msg/TensorMetadata.msg"
+  "srv/ServerLive.srv"
+  "srv/ServerReady.srv"
+  "srv/ModelInfer.srv"
+  "srv/ModelReady.srv"
+  "srv/ModelMetadata.srv"
+  DEPENDENCIES rcl_interfaces tensor_msgs
 )
 
 ament_package()

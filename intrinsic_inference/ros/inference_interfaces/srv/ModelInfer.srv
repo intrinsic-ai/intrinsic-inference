@@ -12,20 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_uv//uv:pip.bzl", "pip_compile")
+# Synchronous model inference request and tensor response
 
-package(default_visibility = ["//visibility:public"])
+string model_name
+string model_version
+string id
 
-exports_files([
-    "MODULE.bazel",
-    "requirements.in",
-    "requirements.txt",
-])
+NamedTensor[] inputs
+string[] requested_outputs
+rcl_interfaces/Parameter[] parameters
+---
+bool success
+string error_message
+string model_name
+string model_version
+string id
 
-# Compile requirements after changing requirements.in by executing: bazel run @@//:requirements
-pip_compile(
-    name = "requirements",
-    requirements_in = ":requirements.in",
-    requirements_txt = ":requirements.txt",
-    tags = ["manual"],
-)
+NamedTensor[] outputs
+rcl_interfaces/Parameter[] parameters
