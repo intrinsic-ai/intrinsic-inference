@@ -48,3 +48,19 @@ intrinsic-inference/
 
 -   [**ROS inference node docs**](intrinsic_inference/ros/inference_node/README.md)
 -   [**Core framework docs**](intrinsic_inference/core/README.md)
+
+## Documentation and related repositories
+* [**Intrinsic Developer Community**](https://developer.intrinsic.ai): Complete guides, interactive tutorials, and API references.
+---
+## Contributing and community
+Contributions are welcome\! Please review:
+* CONTRIBUTING.md: Details on signing the Google Contributor License Agreement (CLA), community guidelines, C++20 coding standards, and pull request workflows.  
+* SECURITY.md: Instructions for reporting security vulnerabilities.
+---
+## License
+This project is licensed under the Apache 2.0 License.
+---
+> **Disclaimer**: This is not an officially supported Google product.
+---
+### Trademark notice
+"Intrinsic" and "Intrinsic Core" are trademarks of Intrinsic Innovation LLC. See TRADEMARK.md for usage guidelines.
